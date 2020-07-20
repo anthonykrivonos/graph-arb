@@ -5,7 +5,7 @@ import (
 )
 
 type Client interface {
-	Watch(...models.Security)
+	Watch(func(float64, models.Symbol), ...models.Symbol)
 }
 
 type client struct {

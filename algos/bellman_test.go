@@ -24,11 +24,11 @@ func TestBellman(t *testing.T) {
 	usdNode := g.Add(usd)
 
 	// Create arbitrage opportunities
-	g.AddWeightedEdge(btcNode, ethNode, math.NegLog(50))
-	g.AddWeightedEdge(ethNode, bchNode, math.NegLog(40))
-	g.AddWeightedEdge(bchNode, usdNode, math.NegLog(50))
-	g.AddWeightedEdge(bchNode, ethNode, math.NegLog(150))
-	g.AddWeightedEdge(usdNode, btcNode, math.NegLog(100))
+	g.AddWeightedEdge(*btcNode, *ethNode, math.NegLog(50))
+	g.AddWeightedEdge(*ethNode, *bchNode, math.NegLog(40))
+	g.AddWeightedEdge(*bchNode, *usdNode, math.NegLog(50))
+	g.AddWeightedEdge(*bchNode, *ethNode, math.NegLog(150))
+	g.AddWeightedEdge(*usdNode, *btcNode, math.NegLog(100))
 
 	// Get arbitrage paths
 	arbPaths := Bellman(g, btcNode)

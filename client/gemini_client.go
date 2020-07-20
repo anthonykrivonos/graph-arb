@@ -10,7 +10,8 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"strings"
+	"strconv"
+	"sync"
 	"time"
 )
 
@@ -34,33 +35,28 @@ type geminiClientResponse struct {
 	Events []geminiClientEvent
 }
 
-func (c *geminiClient) Watch(securities ...models.Security) {
-	// Create a list of symbols to watch
-	var symbols []string
-	for i, secA := range securities {
-		for j, secB := range securities {
-			if i != j {
-				symbol := strings.ToLower(fmt.Sprintf("%s%s", secA.Name(), secB.Name()))
-				c.watch(fmt.Sprintf("/%s?bids=true&offers=true", symbol))
-				symbols = append(symbols, symbol)
-			}
-		}
+func (c *geminiClient) Watch(callback func(float64, models.Symbol), symbols ...models.Symbol) {
+	var wg sync.WaitGroup
+	for _, symbol := range symbols {
+		wg.Add(1)
+		go c.watch(symbol, callback)
 	}
+	wg.Wait()
 }
 
-func (c *geminiClient) watch(endpoint string) {
+func (c *geminiClient) watch(symbol models.Symbol, callback func(float64, models.Symbol)) {
 	// Create interrupt signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	// Create address to connect to
-	u := url.URL{Scheme: "wss", Host: c.watchHost, Path: fmt.Sprint(c.watchPath, endpoint)}
+	u := url.URL{Scheme: "wss", Host: c.watchHost, Path: fmt.Sprintf("%s/%s", c.watchPath, symbol.String())}
 	fmt.Printf("Connecting to %s\n", u.String())
 
 	// Dial into the socket
 	conn, resp, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
-		log.Fatal("dial: ", err, resp.StatusCode, "\n")
+		log.Fatal("dial: ", err, resp.StatusCode, symbol.String(), "\n")
 	}
 	defer conn.Close()
 
@@ -69,6 +65,7 @@ func (c *geminiClient) watch(endpoint string) {
 	go func() {
 		defer close(done)
 		for {
+			// Receive the message
 			_, message, err := conn.ReadMessage()
 			if err != nil {
 				log.Println("read:", err)
@@ -77,8 +74,13 @@ func (c *geminiClient) watch(endpoint string) {
 			var res geminiClientResponse
 			json.Unmarshal(message, &res)
 
+			// Callback with the ask price
 			if len(res.Events) > 0 {
-				log.Printf("price: %s\n", res.Events[0].Price)
+				if res.Events[0].Side == "ask" {
+					if price, err := strconv.ParseFloat(res.Events[0].Price, 32); err == nil && callback != nil {
+						callback(price, symbol)
+					}
+				}
 			}
 		}
 	}()

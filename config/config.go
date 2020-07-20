@@ -4,6 +4,9 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 )
 
 type Config interface {
@@ -34,7 +37,7 @@ func (c *config) GeminiSecret() string {
 
 func NewConfig() Config {
 	// Load environment variables file
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(path.Join(rootDir(), ".env"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,6 +49,12 @@ func NewConfig() Config {
 	c.geminiSecret = os.Getenv("GEMINI_SECRET")
 
 	return c
+}
+
+func rootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b))
+	return filepath.Dir(d)
 }
 
 // Assert config conforms to Config interface

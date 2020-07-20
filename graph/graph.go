@@ -35,7 +35,7 @@ func (g *Graph) AddNode(n *Node) {
 	g.nodes = append(g.nodes, n)
 }
 
-func (g *Graph) AddWeightedEdge(n1 *Node, n2 *Node, weight float64) {
+func (g *Graph) AddWeightedEdge(n1 Node, n2 Node, weight float64) {
 	g.lock.Lock()
 	defer g.lock.Unlock()
 
@@ -43,21 +43,34 @@ func (g *Graph) AddWeightedEdge(n1 *Node, n2 *Node, weight float64) {
 		g.edges = make(map[Node][] *Edge)
 	}
 
-	g.edges[*n1] = append(g.edges[*n1], NewEdge(n1, n2, weight))
+	e := NewEdge(n1, n2, weight)
+
+	// Overwrite if n1 is already connected to n2
+	includes := false
+	for i, edge := range g.edges[n1] {
+		if edge.to == n2 {
+			includes = true
+			g.edges[n1][i] = e
+			break
+		}
+	}
+
+	// Otherwise, add to the list of edges
+	if !includes {
+		g.edges[n1] = append(g.edges[n1], e)
+	}
 }
 
-func (g *Graph) AddEdge(n1 *Node, n2 *Node) {
+func (g *Graph) AddEdge(n1 Node, n2 Node) {
 	g.AddWeightedEdge(n1, n2, 0.0)
 }
 
-func (g *Graph) AddWeightedBidirectionalEdge(n1 *Node, n2 *Node, weight float64) {
+func (g *Graph) AddWeightedBidirectionalEdge(n1 Node, n2 Node, weight float64) {
 	g.AddWeightedEdge(n1, n2, weight)
-	g.lock.Lock()
-	defer g.lock.Unlock()
-	g.edges[*n2] = append(g.edges[*n2], NewEdge(n2, n1, weight))
+	g.AddWeightedEdge(n2, n1, weight)
 }
 
-func (g *Graph) AddBidirectionalEdge(n1 *Node, n2 *Node) {
+func (g *Graph) AddBidirectionalEdge(n1 Node, n2 Node) {
 	g.AddWeightedBidirectionalEdge(n1, n2, 0.0)
 }
 
