@@ -20,12 +20,12 @@ func fillGraph() {
 	g.AddNode(&nE)
 	g.AddNode(&nF)
 
-	g.AddEdge(&nA, &nB, true)
-	g.AddEdge(&nA, &nC, true)
-	g.AddEdge(&nB, &nE, true)
-	g.AddEdge(&nC, &nE, true)
-	g.AddEdge(&nE, &nF, true)
-	g.AddEdge(&nD, &nA, true)
+	g.AddEdge(&nA, &nB)
+	g.AddEdge(&nA, &nC)
+	g.AddEdge(&nB, &nE)
+	g.AddEdge(&nC, &nE)
+	g.AddEdge(&nE, &nF)
+	g.AddEdge(&nD, &nA)
 }
 
 func TestAdd(t *testing.T) {
