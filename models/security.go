@@ -8,6 +8,10 @@ func (s *Security) Name() string {
 	return s.name
 }
 
+func (s *Security) String() string {
+	return s.name
+}
+
 func NewSecurity(name string) *Security {
 	s := new(Security)
 	s.name = name

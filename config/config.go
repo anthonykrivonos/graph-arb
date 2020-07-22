@@ -14,13 +14,22 @@ type Config interface {
 	GeminiUrl() string
 	GeminiKey() string
 	GeminiSecret() string
+	// Binance
+	BinanceUrl() string
+	BinanceKey() string
+	BinanceSecret() string
 }
 
 type config struct {
 	Config
+	// Gemini
 	geminiUrl string
 	geminiKey string
 	geminiSecret string
+	// Binance
+	binanceUrl string
+	binanceKey string
+	binanceSecret string
 }
 
 func (c *config) GeminiUrl() string {
@@ -35,6 +44,18 @@ func (c *config) GeminiSecret() string {
 	return c.geminiSecret
 }
 
+func (c *config) BinanceUrl() string {
+	return c.binanceUrl
+}
+
+func (c *config) BinanceKey() string {
+	return c.binanceKey
+}
+
+func (c *config) BinanceSecret() string {
+	return c.binanceSecret
+}
+
 func NewConfig() Config {
 	// Load environment variables file
 	err := godotenv.Load(path.Join(rootDir(), ".env"))
@@ -47,6 +68,9 @@ func NewConfig() Config {
 	c.geminiUrl = os.Getenv("GEMINI_URL")
 	c.geminiKey = os.Getenv("GEMINI_KEY")
 	c.geminiSecret = os.Getenv("GEMINI_SECRET")
+	c.binanceUrl = os.Getenv("BINANCE_URL")
+	c.binanceKey = os.Getenv("BINANCE_KEY")
+	c.binanceSecret = os.Getenv("BINANCE_SECRET")
 
 	return c
 }

@@ -1,24 +1,25 @@
 package graph
 
 import (
+	"fmt"
 	"testing"
 )
 
 var g Graph
 
 func fillGraph() {
-	nA := Node{"A"}
-	nB := Node{"B"}
-	nC := Node{"C"}
-	nD := Node{"D"}
-	nE := Node{"E"}
-	nF := Node{"F"}
-	g.AddNode(&nA)
-	g.AddNode(&nB)
-	g.AddNode(&nC)
-	g.AddNode(&nD)
-	g.AddNode(&nE)
-	g.AddNode(&nF)
+	nA := &Node{"A"}
+	nB := &Node{"B"}
+	nC := &Node{"C"}
+	nD := &Node{"D"}
+	nE := &Node{"E"}
+	nF := &Node{"F"}
+	g.AddNode(nA)
+	g.AddNode(nB)
+	g.AddNode(nC)
+	g.AddNode(nD)
+	g.AddNode(nE)
+	g.AddNode(nF)
 
 	g.AddEdge(nA, nB)
 	g.AddEdge(nA, nC)
@@ -30,5 +31,5 @@ func fillGraph() {
 
 func TestAdd(t *testing.T) {
 	fillGraph()
-	g.String()
+	fmt.Print(g.String())
 }
