@@ -31,7 +31,7 @@ func TestBellman(t *testing.T) {
 	g.AddWeightedEdge(usdNode, btcNode, math.NegLog(100))
 
 	// Get arbitrage paths
-	arbPaths := Bellman(g, btcNode)
+	arbPaths := Bellman(g)
 	for _, path := range arbPaths {
 		fmt.Println(path.String())
 	}
